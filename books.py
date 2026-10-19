@@ -23,4 +23,4 @@ def search_by_isbn(books, isbn):
     isbn = isbn.strip()
     return [b for b in books if b["isbn"] == isbn]
 
-MAX_BOOKS = 500 
+MAX_BOOKS = 100 
