@@ -8,7 +8,7 @@ def load_books(filename="books.json"):
         return []
 
 def add_book(books, title, author, isbn):
-    books.append({"title": title, "author": author, "isbn": isbn})
+    books.append({"title": title, "author": author, "isbn": isbn})#kfvjekr
     return books
 
 def find_by_author(books, author_name):
@@ -20,6 +20,7 @@ def export_books(books, filename="export.txt"):
             f.write(f"{b['title']} | {b['author']} | {b['isbn']}\n")
 
 def search_by_isbn(books, isbn):
+    isbn = isbn.strip()
     return [b for b in books if b["isbn"] == isbn]
 
 MAX_BOOKS = 500 
