@@ -33,3 +33,25 @@ jobs:
           python-version: '3.11.10'
       - name: Run tests
         run: python -m unittest discover -s tests -v
+
+  package:
+    runs-on: ubuntu-latest
+    needs: unit_tests
+    steps:
+      - uses: actions/checkout@v4
+      - name: Сборка dist
+        run: |
+          mkdir -p dist
+          cp books.py README.md Dockerfile books.json.example dist/
+          {
+            echo "CI_COMMIT_SHA=$GITHUB_SHA"
+            echo "CI_PIPELINE_ID=$GITHUB_RUN_ID"
+            echo "Files:"
+            ls dist
+          } > dist/manifest.txt
+      - name: Загрузка артефакта
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+          retention-days: 7
