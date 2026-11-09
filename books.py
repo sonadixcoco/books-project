@@ -12,7 +12,7 @@ def add_book(books, title, author, isbn):
     return books
 
 def find_by_author(books, author_name):
-    return [b for b in books if author_name.lower() in b["author"]]
+    return [b for b in books if author_name.lower() in b["author"].lower()]
 
 def export_books(books, filename="export.txt"):
     with open(filename, "w", encoding="utf-8") as f:
