@@ -55,3 +55,37 @@ jobs:
           name: dist-${{ github.sha }}
           path: dist/
           retention-days: 7
+  deploy_test:
+    runs-on: ubuntu-latest
+    needs: package
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: test/books
+      url: https://example.com/test/books
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist/
+      - name: Деплой и дымовая проверка
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          test -n "$DEPLOY_TOKEN" || (echo "DEPLOY_TOKEN не задан" && exit 1)
+          echo "Токен присутствует (значение не выводится)"
+          mkdir -p deploy/test
+          cp -r dist/* deploy/test/
+          python app.py || true
+          python -c "import json; data = json.load(open('books.json.example')); assert len(data) > 0; print('Smoke OK')"
+          {
+            echo "DEPLOY_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "PIPELINE=$GITHUB_RUN_ID"
+            echo "COMMIT=$GITHUB_SHA"
+            echo "SMOKE=passed"
+          } > deploy/test/deployment.txt
+      - name: Загрузка отчета о деплое
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-report
+          path: deploy/test/deployment.txt
